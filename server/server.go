@@ -42,26 +42,37 @@ func RandomString(length int) string {
 	return string(randomString)
 }
 
-func tesseract(file string) (string, error) {
+func removeInputOutputFiles(input string, output string) error {
+	if err1, err2 := os.Remove(input), os.Remove(output); err1 != nil || err2 != nil {
+		return fmt.Errorf("failed to remove tmp files")
+	}
+	return nil
+}
+
+func tesseract(file string, lang string) (string, error) {
 	cwd, _ := os.Getwd()
-	ocr_path := "server/ocr/" + RandomString(8)
-	_, err := exec.Command("tesseract", filepath.Join(cwd, "server", file), filepath.Join(cwd, ocr_path), "-l", "pol").Output()
+	input_path := filepath.Join(cwd, "server", file)
+	ocr_path := filepath.Join(cwd, "server/ocr", RandomString(8))
+	_, err := exec.Command("tesseract", input_path, ocr_path, "-l", lang).Output()
+	ocr_path += ".txt" //Tesseract by default appends ".txt" at the end of output file
 
 	if err != nil {
-		return "Tesseract failed", err
+		return "Tesseract failed, probably requested language is not supported", err
 	}
 
-	text, err := os.ReadFile(filepath.Join(cwd, ocr_path) + ".txt")
+	text, err := os.ReadFile(ocr_path)
 
 	if err != nil {
 		return "Reading file failed", err
 	}
 
+	defer removeInputOutputFiles(input_path, ocr_path)
 	return string(text), nil
 }
 
 type ImageData struct {
 	Base64 string `json:"base64"`
+	Lang   string `json:"lang"`
 	Auth   string `json:"auth_token"`
 }
 
@@ -81,7 +92,7 @@ func ProcessImage(c echo.Context) (string, error) {
 		return "Failed to save file", err
 	}
 
-	ocr, err := tesseract(img)
+	ocr, err := tesseract(img, req.Lang)
 
 	if err != nil {
 		return ocr, err
