@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func loadFile(img_path string) string {
+func LoadFile(img_path string) string {
 	file, err := os.ReadFile(img_path)
 
 	if err != nil {
@@ -18,7 +18,7 @@ func loadFile(img_path string) string {
 		return ""
 	}
 
-	encoded := base64.StdEncoding.EncodeToString([]byte(file))
+	encoded := base64.StdEncoding.EncodeToString(file)
 	return encoded
 }
 
@@ -76,18 +76,4 @@ func mapResponse(reply string) (map[string]string, error) {
 		return nil, err
 	}
 	return mappedData, nil
-}
-
-func main() {
-	client := &http.Client{}
-
-	encoded_img := loadFile("test.png")
-	resp := processImg(client, encoded_img)
-	data, err := mapResponse(resp)
-
-	if err != nil {
-		fmt.Println("Error mapping response:", err)
-	}
-
-	fmt.Println("OCRed text:", data["result"])
 }
