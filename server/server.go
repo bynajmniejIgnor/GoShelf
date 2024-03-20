@@ -6,9 +6,8 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
-	"time"
-
 	"path/filepath"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
