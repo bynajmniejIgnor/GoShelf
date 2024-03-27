@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -66,7 +67,7 @@ func tesseract(file string, lang string) (string, error) {
 	}
 
 	defer removeInputOutputFiles(input_path, ocr_path)
-	return string(text), nil
+	return strings.ReplaceAll(string(text), "\n", ";"), nil
 }
 
 type ImageData struct {
