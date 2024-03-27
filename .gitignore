@@ -1,6 +1,6 @@
 go.mod
 go.sum
-test.png
+*.png
 
 server/images/*
 server/ocr/*
