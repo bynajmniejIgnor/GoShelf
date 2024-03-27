@@ -2,7 +2,7 @@
 Simple project for Mobile Aplications class at uni for tracking your home library, written (backend at least) in Golang.
 ![logo](./misc/logo.jpg)
 
-#### Technologies used
+#### Technologies used/to be used
 * Android Studio
 * Tesseract (ocr)
 * Postgresdb 
