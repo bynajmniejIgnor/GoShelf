@@ -6,4 +6,9 @@
     android:gravity="center">
 
 
+    <Button
+        android:id="@+id/new_shelf_btn"
+        android:layout_width="411dp"
+        android:layout_height="wrap_content"
+        android:text="New Shelf" />
 </LinearLayout>

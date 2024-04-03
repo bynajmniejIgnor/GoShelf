@@ -21,27 +21,4 @@ class MainActivity : AppCompatActivity() {
 
         //displayBackButton()
     }
-    private fun isShelfContent(): Boolean{
-        val fragmentTag = supportFragmentManager.getBackStackEntryAt(
-            supportFragmentManager.backStackEntryCount - 1
-        ).name
-        return fragmentTag == "ShelfContent"
-    }
-
-    private fun displayBackButton() {
-        if (isShelfContent()) {
-            val backButton: Button = findViewById(R.id.back_button)
-            backButton.visibility = View.VISIBLE
-
-            /*backButton.setOnClickListener {
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_container, ShelfList())
-                    addToBackStack(null)
-                    commit()
-                }
-            }
-
-             */
-        }
-    }
 }
