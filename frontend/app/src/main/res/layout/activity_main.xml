@@ -21,7 +21,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
-        android:name="com.example.myapplication.Header"
+        android:name="com.example.goshelf.Header"
         android:layout_width="383dp"
         android:layout_height="83dp"
         android:layout_marginTop="16dp"

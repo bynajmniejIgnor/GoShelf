@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.goshelf
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,10 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModel
+
+class SavedModel : ViewModel() {
+    var savedShelves: MutableList<String> = mutableListOf()
+}
 
 class ShelfList : Fragment(R.layout.fragment_list) {
-
-    private var shelves = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -20,9 +23,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val newShelfBtn = view.findViewById<Button>(R.id.new_shelf_btn)
 
-        newShelfBtn.setOnClickListener(){
+        newShelfBtn.setOnClickListener{
             createShelf(view, "New Shelf")
-            shelves.add("New Shelf")
         }
         return view
     }
@@ -34,9 +36,6 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         createShelf(view, "Kitchen")
         createShelf(view, "Bedroom")
 
-        for (shelf in shelves){
-            createShelf(view, shelf)
-        }
     }
 
     private fun createShelf(view: View, name: String) {
@@ -45,7 +44,6 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             ViewGroup.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        layoutParams.setMargins(16, 16, 16, 16)
 
         val linearLayout = LinearLayout(context)
         linearLayout.orientation = LinearLayout.HORIZONTAL

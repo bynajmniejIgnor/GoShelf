@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.goshelf
 
 import org.junit.Test
 

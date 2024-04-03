@@ -1,4 +1,4 @@
-package com.example.myapplication.placeholder
+package com.example.goshelf.placeholder
 
 import java.util.ArrayList
 import java.util.HashMap
