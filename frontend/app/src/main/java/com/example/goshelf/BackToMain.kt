@@ -18,10 +18,12 @@ class BackToMain : Fragment() {
 
         val back_btn = view.findViewById<Button>(R.id.back_btn)
 
+        val loadedShelves = arguments?.getString("loadedShelves")
+
         back_btn.setOnClickListener(){
             activity?.supportFragmentManager?.beginTransaction()?.apply {
                 replace(R.id.fragmentContainerView, Header().apply{})
-                replace(R.id.fragment_container, ShelfList().apply {  })
+                replace(R.id.fragment_container, ShelfList().apply {})
                 addToBackStack(null)
                 commit()
             }

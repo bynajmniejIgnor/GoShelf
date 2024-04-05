@@ -7,14 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.lifecycle.ViewModel
-
-class SavedModel : ViewModel() {
-    var savedShelves: MutableList<String> = mutableListOf()
-}
+import android.widget.Toast
 
 class ShelfList : Fragment(R.layout.fragment_list) {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -24,7 +19,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         val newShelfBtn = view.findViewById<Button>(R.id.new_shelf_btn)
 
         newShelfBtn.setOnClickListener{
-            createShelf(view, "New Shelf")
+            createShelf(view, "New Shelf",0)
         }
         return view
     }
@@ -32,13 +27,15 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        createShelf(view, "Living room")
-        createShelf(view, "Kitchen")
-        createShelf(view, "Bedroom")
 
+        val loadedShelves = arguments?.getString("loadedShelves")
+
+        createShelf(view, "Living room", 0)
+        createShelf(view, "Kitchen", 0)
+        createShelf(view, "Bedroom", 0)
     }
 
-    private fun createShelf(view: View, name: String) {
+    private fun createShelf(view: View, name: String, booksOn: Int) {
         val shelfHeight = 250
         val layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -49,16 +46,16 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         linearLayout.orientation = LinearLayout.HORIZONTAL
         linearLayout.layoutParams = layoutParams
 
-        val addBtn = Button(context)
-        addBtn.text = "+"
+        val addBookBtn = Button(context)
+        addBookBtn.text = "+"
         val addParams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
             0.2f
         )
         addParams.setMargins(16, 16, 16, 16)
-        addBtn.layoutParams = addParams
-        addBtn.height = shelfHeight
+        addBookBtn.layoutParams = addParams
+        addBookBtn.height = shelfHeight
 
         val shelfBtn = Button(context)
         shelfBtn.text = name
@@ -72,23 +69,31 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         shelfBtn.height = shelfHeight
 
         linearLayout.addView(shelfBtn)
-        linearLayout.addView(addBtn)
+        linearLayout.addView(addBookBtn)
 
         (view as LinearLayout).addView(linearLayout)
 
         val args = Bundle().apply {
             putString("shelfName", name)
         }
+
         shelfBtn.setOnClickListener {
             activity?.supportFragmentManager?.beginTransaction()?.apply {
                 replace(R.id.fragment_container, ShelfContent().apply {
                     arguments = args
                 })
-                replace(R.id.fragmentContainerView, BackToMain().apply {  })
+                replace(R.id.fragmentContainerView, BackToMain().apply {
+                    arguments = args
+                })
                 addToBackStack(null)
                 commit()
             }
         }
+
+       addBookBtn.setOnClickListener {
+           Toast.makeText(requireContext(), "Added book to shelf $name", Toast.LENGTH_SHORT).show()
+       }
+
     }
 
 }
