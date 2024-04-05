@@ -1,11 +1,13 @@
 package com.example.goshelf
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 
@@ -17,19 +19,26 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
 
         val newShelfBtn = view.findViewById<Button>(R.id.new_shelf_btn)
+        val newShelfNameField = view.findViewById<EditText>(R.id.new_shelf_name)
+        var newSelfName: String = ""
 
         newShelfBtn.setOnClickListener{
-            createShelf(view, "New Shelf",0)
+            if (newShelfBtn.text == "New Shelf"){
+                newShelfNameField.visibility = View.VISIBLE
+                newShelfBtn.text = "Submit"
+            }
+            else{
+                newSelfName = newShelfNameField.getText().toString()
+                createShelf(view, newSelfName, 0)
+                newShelfNameField.visibility = View.GONE
+                newShelfBtn.text = "New Shelf"
+            }
         }
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        val loadedShelves = arguments?.getString("loadedShelves")
-
         createShelf(view, "Living room", 0)
         createShelf(view, "Kitchen", 0)
         createShelf(view, "Bedroom", 0)
