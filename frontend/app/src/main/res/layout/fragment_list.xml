@@ -5,12 +5,6 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <Button
-        android:id="@+id/new_shelf_btn"
-        android:layout_width="349dp"
-        android:layout_height="wrap_content"
-        android:text="New Shelf" />
-
     <EditText
         android:id="@+id/new_shelf_name"
         android:layout_width="match_parent"
@@ -18,5 +12,11 @@
         android:hint="End the name shelf be..."
         android:inputType="text"
         android:visibility="gone" />
+
+    <Button
+        android:id="@+id/new_shelf_btn"
+        android:layout_width="349dp"
+        android:layout_height="wrap_content"
+        android:text="New Shelf" />
 
 </LinearLayout>
