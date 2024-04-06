@@ -1,17 +1,21 @@
 package com.example.goshelf
 
-import android.app.AlertDialog
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 
 class ShelfList : Fragment(R.layout.fragment_list) {
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -20,19 +24,33 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val newShelfBtn = view.findViewById<Button>(R.id.new_shelf_btn)
         val newShelfNameField = view.findViewById<EditText>(R.id.new_shelf_name)
-        var newSelfName: String = ""
+        var newSelfName = ""
+
+        newShelfNameField.addTextChangedListener {
+            if (newShelfNameField.getText().toString().isNotEmpty()) {
+                newShelfBtn.text = "Submit"
+            }
+            else {
+                newShelfBtn.text = "Back"
+            }
+        }
 
         newShelfBtn.setOnClickListener{
             if (newShelfBtn.text == "New Shelf"){
+                newShelfNameField.setText("")
                 newShelfNameField.visibility = View.VISIBLE
-                newShelfBtn.text = "Submit"
+                newShelfNameField.requestFocus()
+                newShelfBtn.text = "Back"
             }
             else{
                 newSelfName = newShelfNameField.getText().toString()
-                createShelf(view, newSelfName, 0)
+                if (newSelfName.isNotEmpty()) {
+                    createShelf(view, newSelfName, 0)
+                }
                 newShelfNameField.visibility = View.GONE
                 newShelfBtn.text = "New Shelf"
             }
+            newShelfNameField.hideKeyboard()
         }
         return view
     }
@@ -103,6 +121,11 @@ class ShelfList : Fragment(R.layout.fragment_list) {
            Toast.makeText(requireContext(), "Added book to shelf $name", Toast.LENGTH_SHORT).show()
        }
 
+    }
+
+    fun View.hideKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
 }

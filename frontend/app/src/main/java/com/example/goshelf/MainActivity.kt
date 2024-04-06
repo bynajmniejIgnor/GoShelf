@@ -14,7 +14,5 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment_container, ShelfList())
             .addToBackStack(null)
             .commit()
-
-        //displayBackButton()
     }
 }
