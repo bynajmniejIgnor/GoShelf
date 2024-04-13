@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +16,10 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
+import com.journeyapps.barcodescanner.CaptureActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -117,15 +118,13 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         linearLayout.addView(shelfBtn)
         linearLayout.addView(addBookBtn)
 
-        innerLinearLayout.addView(linearLayout) // Add to the inner LinearLayout
+        innerLinearLayout.addView(linearLayout)
 
         val args = Bundle().apply {
             putString("shelfName", name)
         }
 
         shelfBtn.setOnClickListener {
-            // Handle shelfBtn click
-            // Replace fragments, etc.
             Toast.makeText(requireContext(), "Shelf Button Clicked: $name", Toast.LENGTH_SHORT).show()
         }
 
@@ -143,19 +142,15 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
-                // Handle failure (e.g., network error)
                 requireActivity().runOnUiThread {
-                    // Execute callback with an empty response body
                     callback.invoke("")
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                // Check if the response is successful
                 val responseBody = response.body?.string() ?: ""
 
                 requireActivity().runOnUiThread {
-                    // Execute callback with the response body
                     callback.invoke(responseBody)
                 }
             }
@@ -164,11 +159,13 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
     private fun startBarcodeScanning() {
         val integrator = IntentIntegrator.forSupportFragment(this)
-        integrator.setPrompt("Scan a barcode")
-        integrator.setOrientationLocked(true)
+        integrator.setPrompt("Show me some book EANs")
+
+        // god bless https://stackoverflow.com/questions/33550042/zxing-embedded-setcaptureactivity-causes-that-the-activity-does-not-appear
+        // now i can rotate my scanner
+        integrator.setOrientationLocked(false)
         integrator.setBeepEnabled(true)
 
-        integrator.addExtra("SCAN_FOCUS_MODES", "AUTO")
         integrator.initiateScan()
     }
 
@@ -179,11 +176,9 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents == null) {
-                Toast.makeText(requireContext(), "Show me some EAN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Scan cancelled", Toast.LENGTH_SHORT).show()
             } else {
-                // Barcode scanned successfully
                 val barcodeValue = result.contents
-                //Toast.makeText(requireContext(), "Scanned: $barcodeValue", Toast.LENGTH_SHORT).show()
                 Log.d("BarcodeScanner", "Scanned: $barcodeValue")
                 httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
                     Log.d("Google api response",responseBody)
@@ -201,10 +196,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Camera permission granted, start scanning
                 startBarcodeScanning()
             } else {
-                // Camera permission denied
                 Toast.makeText(
                     requireContext(),
                     "Camera permission required for scanning",
@@ -217,4 +210,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
+}
+
+class CaptureActivityPortrait : CaptureActivity() {
+
 }
