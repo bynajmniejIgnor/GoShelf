@@ -1,7 +1,6 @@
 package com.example.goshelf
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,16 +16,19 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultCallback
 import androidx.core.widget.addTextChangedListener
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
-import com.journeyapps.barcodescanner.CaptureActivity
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okio.IOException
 
 class ShelfList : Fragment(R.layout.fragment_list) {
+    private val client = OkHttpClient()
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -133,6 +135,33 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
     }
 
+    private fun httpGet(url: String, callback: (String) -> Unit) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                // Handle failure (e.g., network error)
+                requireActivity().runOnUiThread {
+                    // Execute callback with an empty response body
+                    callback.invoke("")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                // Check if the response is successful
+                val responseBody = response.body?.string() ?: ""
+
+                requireActivity().runOnUiThread {
+                    // Execute callback with the response body
+                    callback.invoke(responseBody)
+                }
+            }
+        })
+    }
+
     private fun startBarcodeScanning() {
         val integrator = IntentIntegrator.forSupportFragment(this)
         integrator.setPrompt("Scan a barcode")
@@ -154,8 +183,11 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             } else {
                 // Barcode scanned successfully
                 val barcodeValue = result.contents
-                Toast.makeText(requireContext(), "Scanned: $barcodeValue", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), "Scanned: $barcodeValue", Toast.LENGTH_SHORT).show()
                 Log.d("BarcodeScanner", "Scanned: $barcodeValue")
+                httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
+                    Log.d("Google api response",responseBody)
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
