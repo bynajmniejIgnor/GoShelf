@@ -5,18 +5,30 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <EditText
-        android:id="@+id/new_shelf_name"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:hint="End the name shelf be..."
-        android:inputType="text"
-        android:visibility="gone" />
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/new_shelf_btn"
-        android:layout_width="349dp"
-        android:layout_height="wrap_content"
-        android:text="New Shelf" />
+        <LinearLayout
+            android:id="@+id/inner_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
+            <Button
+                android:id="@+id/new_shelf_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="New Shelf" />
+
+            <EditText
+                android:id="@+id/new_shelf_name"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:hint="End the name shelf be..."
+                android:inputType="text"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

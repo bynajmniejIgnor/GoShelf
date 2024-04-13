@@ -15,4 +15,12 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    override fun onBackPressed() {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment is ShelfList) {
+            return
+        }
+        super.onBackPressed()
+    }
 }
