@@ -100,7 +100,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             LinearLayout.LayoutParams.WRAP_CONTENT,
             0.2f
         )
-        addParams.setMargins(16, 16, 16, 16)
+        addParams.setMargins(8, 8, 8, 8)
         addBookBtn.layoutParams = addParams
         addBookBtn.height = shelfHeight
 
@@ -111,7 +111,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             LinearLayout.LayoutParams.WRAP_CONTENT,
             0.8f
         )
-        shelfParams.setMargins(16, 16, 16, 16)
+        shelfParams.setMargins(8, 8, 8, 8)
         shelfBtn.layoutParams = shelfParams
         shelfBtn.height = shelfHeight
 
