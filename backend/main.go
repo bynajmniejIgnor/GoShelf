@@ -19,8 +19,9 @@ type ErrorResponse struct {
 func main() {
 	e := echo.New()
 
-	e.POST("/shelfs", func(c echo.Context) error {
-		resp, err := sqlhandler.GetShelfs(c)
+	e.GET("/shelves/:user_id", func(c echo.Context) error {
+		user_id := c.Param("user_id")
+		resp, err := sqlhandler.GetShelves(user_id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
 		}

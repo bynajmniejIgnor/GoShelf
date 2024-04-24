@@ -28,6 +28,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
+import org.json.JSONArray
 import org.json.JSONObject
 import java.sql.Connection
 import java.sql.DriverManager
@@ -78,12 +79,27 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         return view
     }
 
+    private fun displayShelves(view: View, rawJson: String) {
+        try {
+            val response = JSONObject(rawJson).getString("response")
+            val shelves = JSONArray(response)
+            Log.d("Shelves",shelves.toString())
+                for (i in 0 until shelves.length()){
+                    val name = shelves.getJSONObject(i).getString("Name")
+                    val booksStored = shelves.getJSONObject(i).getString("Books_stored")
+                    createShelf(view, name, booksStored.toInt())
+                }
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
 
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        createShelf(view, "Living room", 0)
-        createShelf(view, "Kitchen", 0)
-        createShelf(view, "Bedroom", 0)
+        httpGet("http://192.168.0.168:8080/shelves/1") { responseBody ->
+            displayShelves(view, responseBody)
+        }
     }
 
     private fun createShelf(view: View, name: String, booksOn: Int) {
