@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  book_keeper:
+    build:
+      dockerfile: Dockerfile
+    ports: 
+      - "3306:3306"
+    network_mode:
+      bridge      

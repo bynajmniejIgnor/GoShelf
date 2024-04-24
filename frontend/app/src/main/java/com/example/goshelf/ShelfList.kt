@@ -125,7 +125,14 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
 
         shelfBtn.setOnClickListener {
-            Toast.makeText(requireContext(), "Shelf Button Clicked: $name", Toast.LENGTH_SHORT).show()
+            activity?.supportFragmentManager?.beginTransaction()?.apply {
+                replace(R.id.fragmentContainerView, BackToMain().apply{})
+                replace(R.id.fragment_container, ShelfContent().apply{
+                    arguments = args
+                })
+                addToBackStack(null)
+                commit()
+            }
         }
 
         addBookBtn.setOnClickListener {

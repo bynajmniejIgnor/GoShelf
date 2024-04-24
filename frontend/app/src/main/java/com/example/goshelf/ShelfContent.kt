@@ -17,7 +17,7 @@ class ShelfContent : Fragment() {
         val shelfName = arguments?.getString("shelfName")
 
         val textView: TextView = rootView.findViewById(R.id.shelf_name)
-        textView.text = shelfName
+        textView.text = shelfName + " books"
 
         return rootView
     }
