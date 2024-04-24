@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,8 +29,10 @@ import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
 import org.json.JSONObject
+import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
+
 
 class ShelfList : Fragment(R.layout.fragment_list) {
     private val client = OkHttpClient()
@@ -210,20 +214,6 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         integrator.setBeepEnabled(true)
 
         integrator.initiateScan()
-    }
-
-    private fun connectDB(url: String){
-        try{
-            val c = DriverManager.getConnection(
-                url,
-                "root",
-                "ilovebooks"
-            )
-            Log.d("Mariadb", "CONNECTED LESSGO")
-        } catch (e: SQLException){
-            e.printStackTrace()
-        }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

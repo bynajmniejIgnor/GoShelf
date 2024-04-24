@@ -50,5 +50,5 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-
+    implementation("mysql:mysql-connector-java:8.0.28")
 }
