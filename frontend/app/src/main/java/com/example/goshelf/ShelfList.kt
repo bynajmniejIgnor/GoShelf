@@ -26,6 +26,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
+import org.json.JSONObject
+import java.sql.DriverManager
+import java.sql.SQLException
 
 class ShelfList : Fragment(R.layout.fragment_list) {
     private val client = OkHttpClient()
@@ -40,7 +43,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val newShelfBtn = view.findViewById<Button>(R.id.new_shelf_btn)
         val newShelfNameField = view.findViewById<EditText>(R.id.new_shelf_name)
-        var newSelfName = ""
+        var newShelfName = ""
 
         newShelfNameField.addTextChangedListener {
             if (newShelfNameField.getText().toString().isNotEmpty()) {
@@ -59,9 +62,9 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                 newShelfBtn.text = "Back"
             }
             else{
-                newSelfName = newShelfNameField.getText().toString()
-                if (newSelfName.isNotEmpty()) {
-                    createShelf(view, newSelfName, 0)
+                newShelfName = newShelfNameField.getText().toString()
+                if (newShelfName.isNotEmpty()) {
+                    createShelf(view, newShelfName, 0)
                 }
                 newShelfNameField.visibility = View.GONE
                 newShelfBtn.text = "New Shelf"
@@ -164,6 +167,39 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         })
     }
 
+    data class BookInfo(
+        val title: String,
+        val subtitle: String?,
+        val authors: List<String>
+    )
+    private fun parseJson(rawJson: String): BookInfo? {
+        try {
+            val items = JSONObject(rawJson).getJSONArray("items")
+            if (items.length() > 0) {
+                val volumeInfo = items.getJSONObject(0).getJSONObject("volumeInfo")
+                val title = volumeInfo.getString("title")
+                val authorsArray = volumeInfo.getJSONArray("authors")
+
+                val authors = mutableListOf<String>()
+                for (i in 0 until authorsArray.length()) {
+                    authors.add(authorsArray.getString(i))
+                }
+
+                val subtitle = if (volumeInfo.has("subtitle")) {
+                    volumeInfo.getString("subtitle")
+                } else {
+                    null
+                }
+
+               return BookInfo(title, subtitle, authors)
+            }
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
     private fun startBarcodeScanning() {
         val integrator = IntentIntegrator.forSupportFragment(this)
         integrator.setPrompt("Show me some book EANs")
@@ -174,6 +210,20 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         integrator.setBeepEnabled(true)
 
         integrator.initiateScan()
+    }
+
+    private fun connectDB(url: String){
+        try{
+            val c = DriverManager.getConnection(
+                url,
+                "root",
+                "ilovebooks"
+            )
+            Log.d("Mariadb", "CONNECTED LESSGO")
+        } catch (e: SQLException){
+            e.printStackTrace()
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -188,7 +238,13 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                 val barcodeValue = result.contents
                 Log.d("BarcodeScanner", "Scanned: $barcodeValue")
                 httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
-                    Log.d("Google api response",responseBody)
+                    val bookInfo = parseJson(responseBody)
+                    if (bookInfo != null){
+                        Log.d("Title",bookInfo.title)
+                        if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
+                        Log.d("Authors:",bookInfo.authors.toString())
+                    }
+
                 }
             }
         } else {
