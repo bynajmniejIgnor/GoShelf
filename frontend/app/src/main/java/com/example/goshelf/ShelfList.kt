@@ -19,6 +19,7 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.example.gobook.ShelfContent
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.CaptureActivity
@@ -69,7 +70,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             else{
                 newShelfName = newShelfNameField.getText().toString()
                 if (newShelfName.isNotEmpty()) {
-                    createShelf(view, newShelfName, 0)
+                    createShelf(view, newShelfName, 0, 42) //TODO: CREATE SHELF DATABASE REQUEST
                 }
                 newShelfNameField.visibility = View.GONE
                 newShelfBtn.text = "New Shelf"
@@ -87,7 +88,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                 for (i in 0 until shelves.length()){
                     val name = shelves.getJSONObject(i).getString("Name")
                     val booksStored = shelves.getJSONObject(i).getString("Books_stored")
-                    createShelf(view, name, booksStored.toInt())
+                    val shelfId = shelves.getJSONObject(i).getString("Shelf_id").toInt()
+                    createShelf(view, name, booksStored.toInt(), shelfId)
                 }
         }
         catch (e: Exception) {
@@ -102,7 +104,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
     }
 
-    private fun createShelf(view: View, name: String, booksOn: Int) {
+    private fun createShelf(view: View, name: String, booksOn: Int, id: Int) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -145,6 +147,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val args = Bundle().apply {
             putString("shelfName", name)
+            putInt("shelfId",id)
         }
 
         shelfBtn.setOnClickListener {
@@ -164,7 +167,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
     }
 
-    private fun httpGet(url: String, callback: (String) -> Unit) {
+    fun httpGet(url: String, callback: (String) -> Unit) {
         val request = Request.Builder()
             .url(url)
             .build()

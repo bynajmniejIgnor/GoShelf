@@ -28,5 +28,14 @@ func main() {
 		return c.JSON(http.StatusOK, OKresponse{JsonData: resp})
 	})
 
+	e.GET("/books/:shelf_id", func(c echo.Context) error {
+		shelf_id := c.Param("shelf_id")
+		resp, err := sqlhandler.GetBooks(shelf_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: resp})
+	})
+
 	e.Logger.Fatal(e.Start(":8080"))
 }

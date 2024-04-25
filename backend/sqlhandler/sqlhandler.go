@@ -22,6 +22,7 @@ func connect(db_path string) *sql.DB {
 
 type Shelf struct {
 	Name         string
+	Shelf_id     int
 	Books_stored int
 }
 
@@ -33,7 +34,7 @@ func GetShelves(user_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
-	rows, err := db.Query("SELECT name, books_stored FROM shelves WHERE user_id = ?", user_id)
+	rows, err := db.Query("SELECT name, shelf_id, books_stored FROM shelves WHERE user_id = ?", user_id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +43,7 @@ func GetShelves(user_id string) (string, error) {
 	var shelves []Shelf
 	var shelf Shelf
 	for rows.Next() {
-		err := rows.Scan(&shelf.Name, &shelf.Books_stored)
+		err := rows.Scan(&shelf.Name, &shelf.Shelf_id, &shelf.Books_stored)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -57,7 +58,7 @@ func GetShelves(user_id string) (string, error) {
 	return string(jsonData), nil
 }
 
-func GetBooks(shelf_id int) (string, error) {
+func GetBooks(shelf_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
@@ -70,6 +71,17 @@ func GetBooks(shelf_id int) (string, error) {
 	var books []Book
 	var book Book
 	for rows.Next() {
-		err := rows.Scan(&book.Title)
+		err := rows.Scan(&book.Title, &book.Subtitle, &book.Authors)
+		if err != nil {
+			log.Fatal(err)
+		}
+		books = append(books, book)
 	}
+
+	jsonData, err := json.Marshal(books)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(jsonData), nil
 }
