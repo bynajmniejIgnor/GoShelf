@@ -15,30 +15,15 @@
         android:textAlignment="center"/>
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16px">
         <LinearLayout
+            android:id="@+id/inner_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Book 1"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Book 2"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Book 3"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Book 4"/>
 
         </LinearLayout>
     </ScrollView>

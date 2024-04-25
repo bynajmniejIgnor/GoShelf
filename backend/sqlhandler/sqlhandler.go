@@ -70,11 +70,19 @@ func GetBooks(shelf_id string) (string, error) {
 
 	var books []Book
 	var book Book
+	var subtitle sql.NullString
 	for rows.Next() {
-		err := rows.Scan(&book.Title, &book.Subtitle, &book.Authors)
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		if subtitle.Valid {
+			book.Subtitle = subtitle.String
+		} else {
+			book.Subtitle = ""
+		}
+
 		books = append(books, book)
 	}
 

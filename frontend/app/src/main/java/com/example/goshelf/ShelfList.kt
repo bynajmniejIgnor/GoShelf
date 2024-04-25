@@ -70,7 +70,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             else{
                 newShelfName = newShelfNameField.getText().toString()
                 if (newShelfName.isNotEmpty()) {
-                    createShelf(view, newShelfName, 0, 42) //TODO: CREATE SHELF DATABASE REQUEST
+                    createShelf(view, newShelfName, 0, "42") //TODO: CREATE SHELF DATABASE REQUEST
                 }
                 newShelfNameField.visibility = View.GONE
                 newShelfBtn.text = "New Shelf"
@@ -84,11 +84,10 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         try {
             val response = JSONObject(rawJson).getString("response")
             val shelves = JSONArray(response)
-            Log.d("Shelves",shelves.toString())
                 for (i in 0 until shelves.length()){
                     val name = shelves.getJSONObject(i).getString("Name")
                     val booksStored = shelves.getJSONObject(i).getString("Books_stored")
-                    val shelfId = shelves.getJSONObject(i).getString("Shelf_id").toInt()
+                    val shelfId = shelves.getJSONObject(i).getString("Shelf_id")
                     createShelf(view, name, booksStored.toInt(), shelfId)
                 }
         }
@@ -104,7 +103,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
     }
 
-    private fun createShelf(view: View, name: String, booksOn: Int, id: Int) {
+    private fun createShelf(view: View, name: String, booksOn: Int, id: String) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -147,7 +146,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val args = Bundle().apply {
             putString("shelfName", name)
-            putInt("shelfId",id)
+            putString("shelfId",id)
         }
 
         shelfBtn.setOnClickListener {

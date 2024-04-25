@@ -18,11 +18,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
+import org.json.JSONArray
+import org.json.JSONObject
 
 class ShelfContent : Fragment() {
 
     private val client = OkHttpClient()
-    private fun displayBook(view: View, name: String, booksOn: Int) {
+    private var shelfId: String = ""
+    private fun displayBook(view: View, name: String) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -88,23 +91,29 @@ class ShelfContent : Fragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_shelf_content, container, false)
 
-        val bookName = arguments?.getString("shelfName")
-
         val textView: TextView = rootView.findViewById(R.id.shelf_name)
 
-/* TODO
-        textView.text = bookName + " books"
-        httpGet("https://192.168.0.168/books/") { responseBody ->
-            val bookInfo = parseJson(responseBody)
-            if (bookInfo != null){
-                Log.d("Title",bookInfo.title)
-                if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
-                Log.d("Authors:",bookInfo.authors.toString())
-            }
+        val shelfName = arguments?.getString("shelfName")
+        shelfId = arguments?.getString("shelfId").toString()
+        textView.text = shelfName + " books"
 
+        httpGet("http://192.168.0.168:8080/books/$shelfId") { responseBody ->
+            Log.d("Books", responseBody)
+            try {
+                val response = JSONObject(responseBody).getString("response")
+                val books = JSONArray(response)
+                for (i in 0 until books.length()) {
+                    val title = books.getJSONObject(i).getString("Title")
+                    val subtitle = books.getJSONObject(i).getString("Subtitle")
+                    val authors = books.getJSONObject(i).getString("Authors")
+                    displayBook(rootView, title)
+                }
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-*/
+
         return rootView
     }
-
 }
