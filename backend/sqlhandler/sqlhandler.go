@@ -25,11 +25,15 @@ type Shelf struct {
 	Books_stored int
 }
 
+type Book struct {
+	Title, Subtitle, Authors string
+}
+
 func GetShelves(user_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
-	rows, err := db.Query("SELECT name, books_stored FROM shelf WHERE user_id = ?", user_id)
+	rows, err := db.Query("SELECT name, books_stored FROM shelves WHERE user_id = ?", user_id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,4 +55,21 @@ func GetShelves(user_id string) (string, error) {
 	}
 
 	return string(jsonData), nil
+}
+
+func GetBooks(shelf_id int) (string, error) {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+
+	rows, err := db.Query("SELECT title, subtitle, authors FROM books WHERE shelf_id = ?", shelf_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var books []Book
+	var book Book
+	for rows.Next() {
+		err := rows.Scan(&book.Title)
+	}
 }
