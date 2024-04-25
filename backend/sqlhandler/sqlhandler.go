@@ -13,6 +13,10 @@ func connect(db_path string) *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = db.Query("PRAGMA foreign_keys = ON;")
+	if err != nil {
+		log.Fatal(err)
+	}
 	return db
 }
 
