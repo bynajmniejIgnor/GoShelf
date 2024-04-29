@@ -98,7 +98,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        httpGet("http://192.168.0.168:8080/shelves/1") { responseBody ->
+        httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelves/${MainActivity.getInstance().globalUserId}") { responseBody ->
             displayShelves(view, responseBody)
         }
     }

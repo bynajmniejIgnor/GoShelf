@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import com.example.goshelf.MainActivity
 import com.example.goshelf.R
 import okhttp3.Call
 import okhttp3.Callback
@@ -97,7 +98,7 @@ class ShelfContent : Fragment() {
         shelfId = arguments?.getString("shelfId").toString()
         textView.text = shelfName + " books"
 
-        httpGet("http://192.168.0.168:8080/books/$shelfId") { responseBody ->
+        httpGet("http://${MainActivity.getInstance().globalServerAddress}/books/$shelfId") { responseBody ->
             Log.d("Books", responseBody)
             try {
                 val response = JSONObject(responseBody).getString("response")

@@ -3,7 +3,9 @@ package sqlhandler
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
+	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -56,6 +58,30 @@ func GetShelves(user_id string) (string, error) {
 	}
 
 	return string(jsonData), nil
+}
+
+func GetUserID(username, hash string) (string, error) {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+
+	row, err := db.Query("SELECT user_id FROM users WHERE username = ? AND password = ?", username, hash)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer row.Close()
+
+	var user_id sql.NullInt32
+
+	for row.Next() {
+		err = row.Scan(&user_id)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if user_id.Valid {
+			return strconv.FormatInt(int64(user_id.Int32), 10), nil
+		}
+	}
+	return "-1", fmt.Errorf("login or password incorrect")
 }
 
 func GetBooks(shelf_id string) (string, error) {

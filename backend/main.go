@@ -13,7 +13,7 @@ type OKresponse struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
-	Msg   string `json:"msg"`
+	Msg   string `json:"response"`
 }
 
 func main() {
@@ -35,6 +35,18 @@ func main() {
 			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
 		}
 		return c.JSON(http.StatusOK, OKresponse{JsonData: resp})
+	})
+
+	e.GET("/login/:username/:hash", func(c echo.Context) error {
+		username := c.Param("username")
+		hash := c.Param("hash")
+
+		resp, err := sqlhandler.GetUserID(username, hash)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: string(resp)})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: string(resp)})
+
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
