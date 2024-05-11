@@ -69,5 +69,27 @@ func main() {
 		return c.JSON(http.StatusOK, OKresponse{JsonData: "android id set successfully"})
 	})
 
+	e.GET("addShelf/:user_id/:name", func(c echo.Context) error {
+		user_id := c.Param("user_id")
+		name := c.Param("name")
+
+		err := sqlhandler.AddShelf(name, user_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: "shelf added"})
+	})
+
+	e.GET("deleteShelf/:user_id/:name", func(c echo.Context) error {
+		user_id := c.Param("user_id")
+		name := c.Param("name")
+
+		err := sqlhandler.DeleteShelf(name, user_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: "shelf deleted"})
+	})
+
 	e.Logger.Fatal(e.Start(":8080"))
 }
