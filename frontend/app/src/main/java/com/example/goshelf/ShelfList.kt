@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,9 +30,6 @@ import okhttp3.Response
 import okio.IOException
 import org.json.JSONArray
 import org.json.JSONObject
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
 
 
 class ShelfList : Fragment(R.layout.fragment_list) {
@@ -183,13 +178,13 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         delBookBtn.setOnClickListener{
             val builder = AlertDialog.Builder(context)
-            builder.setTitle("Confirm Action")
+            builder.setTitle("Delete shelf")
             builder.setMessage("Are you sure you want to delete (disintegrate) shelf $name?")
 
             builder.setPositiveButton("Confirm") { dialog, _ ->
                 httpGet("http://${MainActivity.getInstance().globalServerAddress}/deleteShelf/$id"){}
                 Toast.makeText(context, "Shelf $name disintegrated", Toast.LENGTH_SHORT).show()
-                dialog.dismiss() // Dismiss the dialog
+                dialog.dismiss()
             }
 
             builder.setNegativeButton("Cancel") { dialog, _ ->
