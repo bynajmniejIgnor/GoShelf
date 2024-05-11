@@ -73,7 +73,7 @@ func GetUserIdByAndroidId(android_id string) string {
 	var user_id sql.NullString
 
 	for row.Next() {
-		row.Scan(&android_id)
+		row.Scan(&user_id)
 		if err != nil {
 			log.Fatal(err)
 		}

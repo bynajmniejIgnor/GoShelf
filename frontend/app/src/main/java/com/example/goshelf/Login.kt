@@ -18,12 +18,10 @@ import okhttp3.Response
 import okio.IOException
 import org.json.JSONObject
 import java.security.MessageDigest
-import android.provider.Settings.Secure
-
 
 class Login : Fragment() {
     private val client = OkHttpClient()
-    fun httpGet(url: String, callback: (String) -> Unit) {
+    private fun httpGet(url: String, callback: (String) -> Unit) {
         val request = Request.Builder()
             .url(url)
             .build()
@@ -52,14 +50,12 @@ class Login : Fragment() {
         val bytes = password.toByteArray()
         val md = MessageDigest.getInstance("SHA-256")
         val digest = md.digest(bytes)
-        return digest.fold("", { str, it -> str + "%02x".format(it) })
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
     }
 
     @SuppressLint("HardwareIds")
     private fun setAndroidId(user_id: String) {
-        val android_id = Secure.getString(context?.contentResolver, Secure.ANDROID_ID)
-        Log.d("AndroidId", android_id)
-        httpGet("http://${MainActivity.getInstance().globalServerAddress}/androidId/$user_id/$android_id"){ resp ->
+        httpGet("http://${MainActivity.getInstance().globalServerAddress}/setAndroidId/$user_id/${MainActivity.getInstance().globalAndroidId}"){ resp ->
             Log.d("AndroidId", resp)
         }
     }
@@ -67,7 +63,6 @@ class Login : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val rootView = inflater.inflate(R.layout.fragment_login, container, false)
 
         val loginField = rootView.findViewById<EditText>(R.id.loginField)

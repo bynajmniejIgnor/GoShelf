@@ -50,15 +50,15 @@ func main() {
 	})
 
 	e.GET("/androidId/:android_id", func(c echo.Context) error {
-		android_id := c.Param("")
+		android_id := c.Param("android_id")
 		user_id := sqlhandler.GetUserIdByAndroidId(android_id)
-		if android_id != "" {
+		if user_id != "" {
 			return c.JSON(http.StatusOK, OKresponse{JsonData: user_id})
 		}
-		return c.JSON(http.StatusNotFound, ErrorResponse{Error: "AndroidId or userId not found", Msg: "womp womp"})
+		return c.JSON(http.StatusNotFound, ErrorResponse{Error: "AndroidId not found", Msg: ""})
 	})
 
-	e.GET("/androidId/:user_id/:android_id", func(c echo.Context) error {
+	e.GET("/setAndroidId/:user_id/:android_id", func(c echo.Context) error {
 		user_id := c.Param("user_id")
 		android_id := c.Param(("android_id"))
 
