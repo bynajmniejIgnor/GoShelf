@@ -60,6 +60,47 @@ func GetShelves(user_id string) (string, error) {
 	return string(jsonData), nil
 }
 
+func GetUserIdByAndroidId(android_id string) string {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+
+	row, err := db.Query("SELECT user_id FROM users WHERE android_id = ?", android_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer row.Close()
+
+	var user_id sql.NullString
+
+	for row.Next() {
+		row.Scan(&android_id)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if user_id.Valid {
+			return user_id.String
+		}
+	}
+	return ""
+}
+
+func SetAndroidId(user_id, android_id string) error {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+	cmd := `
+		UPDATE users
+		SET android_id = ?
+		WHERE user_id = ?
+	`
+	_, err := db.Exec(cmd, android_id, user_id)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
 func GetUserID(username, hash string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()

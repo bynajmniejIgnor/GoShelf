@@ -6,8 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
-    var globalServerAddress: String = ""
+    var globalServerAddress: String = "192.168.8.106:8080"
     var globalUserId: String = ""
+
     companion object {
         private lateinit var instance: MainActivity
 

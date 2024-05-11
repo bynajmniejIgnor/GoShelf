@@ -8,15 +8,6 @@
 
 
     <EditText
-        android:id="@+id/serverAddressField"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:hint="goshelf server address or domain"
-        android:layout_marginTop="32dp"
-        />
-
-    <EditText
         android:id="@+id/loginField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

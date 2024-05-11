@@ -49,5 +49,25 @@ func main() {
 
 	})
 
+	e.GET("/androidId/:android_id", func(c echo.Context) error {
+		android_id := c.Param("")
+		user_id := sqlhandler.GetUserIdByAndroidId(android_id)
+		if android_id != "" {
+			return c.JSON(http.StatusOK, OKresponse{JsonData: user_id})
+		}
+		return c.JSON(http.StatusNotFound, ErrorResponse{Error: "AndroidId or userId not found", Msg: "womp womp"})
+	})
+
+	e.GET("/androidId/:user_id/:android_id", func(c echo.Context) error {
+		user_id := c.Param("user_id")
+		android_id := c.Param(("android_id"))
+
+		err := sqlhandler.SetAndroidId(user_id, android_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: "android id set successfully"})
+	})
+
 	e.Logger.Fatal(e.Start(":8080"))
 }
