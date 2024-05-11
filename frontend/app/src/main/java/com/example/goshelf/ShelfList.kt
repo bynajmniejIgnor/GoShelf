@@ -34,8 +34,9 @@ import org.json.JSONObject
 
 class ShelfList : Fragment(R.layout.fragment_list) {
     private val client = OkHttpClient()
+    val returnFromShelfSearch = "Back to all them shelves"
 
-    @SuppressLint("SetTextI18n")
+        @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,20 +51,24 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         newShelfNameField.addTextChangedListener {
             if (newShelfNameField.getText().toString().isNotEmpty()) {
                 newShelfBtn.text = "Submit"
-            }
-            else {
+            } else {
                 newShelfBtn.text = "Back"
             }
         }
 
         newShelfBtn.setOnClickListener{
-            if (newShelfBtn.text == "New Shelf"){
+            if (newShelfBtn.text == "New Shelf") {
                 newShelfNameField.setText("")
                 newShelfNameField.visibility = View.VISIBLE
                 newShelfNameField.requestFocus()
                 newShelfBtn.text = "Back"
-            }
-            else{
+            } else if (newShelfBtn.text == returnFromShelfSearch) {
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
+                    replace(R.id.fragment_container, ShelfList().apply{})
+                    addToBackStack(null)
+                    commit()
+                }
+            } else {
                 newShelfName = newShelfNameField.getText().toString()
                 if (newShelfName.isNotEmpty()) {
                     httpGet("http://${MainActivity.getInstance().globalServerAddress}/addShelf/${MainActivity.getInstance().globalUserId}/$newShelfName"){ resp ->
@@ -75,6 +80,16 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                 newShelfBtn.text = "New Shelf"
             }
             newShelfNameField.hideKeyboard()
+        }
+
+        val searched = arguments?.getString("searched")
+        if (searched.isNullOrEmpty()) {
+            httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelves/${MainActivity.getInstance().globalUserId}") { responseBody ->
+                displayShelves(view, responseBody)
+            }
+        } else {
+            newShelfBtn.text = returnFromShelfSearch
+            displayShelves(view, searched)
         }
         return view
     }
@@ -97,10 +112,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelves/${MainActivity.getInstance().globalUserId}") { responseBody ->
-            Log.d("SHELVES", responseBody)
-            displayShelves(view, responseBody)
-        }
+
+
     }
 
     private fun createShelf(view: View, name: String, booksOn: Int, id: String) {

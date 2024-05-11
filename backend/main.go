@@ -91,13 +91,13 @@ func main() {
 		return c.JSON(http.StatusOK, OKresponse{JsonData: "shelf deleted"})
 	})
 
-	e.GET("/search/:object/:user_id/:name", func(c echo.Context) error {
+	e.GET("/search/:object/:user_id/:query", func(c echo.Context) error {
 		object := c.Param("object")
-		name := c.Param("name")
+		query := c.Param("query")
 		user_id := c.Param("user_id")
 
 		if object == "shelf" {
-			resp, err := sqlhandler.SearchShelf(user_id, name)
+			resp, err := sqlhandler.SearchShelf(user_id, query)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
 			}

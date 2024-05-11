@@ -25,7 +25,7 @@ import org.json.JSONObject
 class ShelfContent : Fragment() {
 
     private val client = OkHttpClient()
-    private fun displayBook(view: View, name: String) {
+    private fun displayBook(view: View, name: String, subtitle: String, authors: String) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -40,7 +40,8 @@ class ShelfContent : Fragment() {
         linearLayout.layoutParams = layoutParams
 
         val bookBtn = Button(requireContext())
-        bookBtn.text = name
+
+        bookBtn.text = name+"\n"+subtitle+"\n"+authors
         val bookParams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -106,7 +107,7 @@ class ShelfContent : Fragment() {
                     val title = books.getJSONObject(i).getString("Title")
                     val subtitle = books.getJSONObject(i).getString("Subtitle")
                     val authors = books.getJSONObject(i).getString("Authors")
-                    displayBook(rootView, title)
+                    displayBook(rootView, title, subtitle, authors)
                 }
             }
             catch (e: Exception) {

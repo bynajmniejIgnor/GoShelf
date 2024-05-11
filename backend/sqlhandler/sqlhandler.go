@@ -209,7 +209,7 @@ func SearchShelf(user_id, name string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
-	rows, err := db.Query("SELECT name, shelf_id FROM shelves WHERE user_id = ? AND name LIKE %?%")
+	rows, err := db.Query("SELECT name, shelf_id, books_stored FROM shelves WHERE user_id = ? AND name LIKE ?", user_id, fmt.Sprintf("%%%s%%", name))
 	if err != nil {
 		log.Fatal(err)
 	}
