@@ -25,7 +25,6 @@ import org.json.JSONObject
 class ShelfContent : Fragment() {
 
     private val client = OkHttpClient()
-    private var shelfId: String = ""
     private fun displayBook(view: View, name: String) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
@@ -95,7 +94,7 @@ class ShelfContent : Fragment() {
         val textView: TextView = rootView.findViewById(R.id.shelf_name)
 
         val shelfName = arguments?.getString("shelfName")
-        shelfId = arguments?.getString("shelfId").toString()
+        val shelfId = arguments?.getString("shelfId")
         textView.text = shelfName + " books"
 
         httpGet("http://${MainActivity.getInstance().globalServerAddress}/books/$shelfId") { responseBody ->

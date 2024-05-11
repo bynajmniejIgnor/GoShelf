@@ -1,6 +1,7 @@
 package com.example.goshelf
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -70,7 +71,10 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             else{
                 newShelfName = newShelfNameField.getText().toString()
                 if (newShelfName.isNotEmpty()) {
-                    createShelf(view, newShelfName, 0, "42") //TODO: CREATE SHELF DATABASE REQUEST
+                    httpGet("http://${MainActivity.getInstance().globalServerAddress}/addShelf/${MainActivity.getInstance().globalUserId}/$newShelfName"){ resp ->
+                        val shelf_id = JSONObject(resp).getString("response")
+                        createShelf(view, newShelfName, 0, shelf_id)
+                    }
                 }
                 newShelfNameField.visibility = View.GONE
                 newShelfBtn.text = "New Shelf"
@@ -99,6 +103,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelves/${MainActivity.getInstance().globalUserId}") { responseBody ->
+            Log.d("SHELVES", responseBody)
             displayShelves(view, responseBody)
         }
     }
@@ -128,17 +133,29 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         addBookBtn.layoutParams = addParams
         addBookBtn.height = shelfHeight
 
+        val delBookBtn = Button(requireContext())
+        delBookBtn.text = "-"
+        val delParams = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            0.2f
+        )
+        delParams.setMargins(8, 8, 8, 8)
+        delBookBtn.layoutParams = addParams
+        delBookBtn.height = shelfHeight
+
         val shelfBtn = Button(requireContext())
         shelfBtn.text = name
         val shelfParams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            0.8f
+            0.9f
         )
         shelfParams.setMargins(8, 8, 8, 8)
         shelfBtn.layoutParams = shelfParams
         shelfBtn.height = shelfHeight
 
+        linearLayout.addView(delBookBtn)
         linearLayout.addView(shelfBtn)
         linearLayout.addView(addBookBtn)
 
@@ -146,7 +163,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         val args = Bundle().apply {
             putString("shelfName", name)
-            putString("shelfId",id)
+            putString("shelfId", id)
         }
 
         shelfBtn.setOnClickListener {
@@ -162,7 +179,26 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         addBookBtn.setOnClickListener {
             startBarcodeScanning()
-            Toast.makeText(requireContext(), "Added book to shelf $name", Toast.LENGTH_SHORT).show()
+        }
+
+        delBookBtn.setOnClickListener{
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Confirm Action")
+            builder.setMessage("Are you sure you want to delete (disintegrate) shelf $name?")
+
+            builder.setPositiveButton("Confirm") { dialog, _ ->
+                httpGet("http://${MainActivity.getInstance().globalServerAddress}/deleteShelf/$id"){}
+                Toast.makeText(context, "Shelf $name disintegrated", Toast.LENGTH_SHORT).show()
+                dialog.dismiss() // Dismiss the dialog
+            }
+
+            builder.setNegativeButton("Cancel") { dialog, _ ->
+                Toast.makeText(context, "Disintegration cancelled", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
         }
     }
 
@@ -240,21 +276,17 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         val result: IntentResult? =
             IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
-            if (result.contents == null) {
-                Toast.makeText(requireContext(), "Scan cancelled", Toast.LENGTH_SHORT).show()
-            } else {
-                val barcodeValue = result.contents
-                Log.d("BarcodeScanner", "Scanned: $barcodeValue")
-                httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
-                    val bookInfo = parseJson(responseBody)
-                    if (bookInfo != null){
-                        Toast.makeText(requireContext(), bookInfo.title+" "+bookInfo.authors, Toast.LENGTH_SHORT).show()
-                        Log.d("Title",bookInfo.title)
-                        if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
-                        Log.d("Authors:",bookInfo.authors.toString())
-                    }
-
+            val barcodeValue = result.contents
+            Log.d("BarcodeScanner", "Scanned: $barcodeValue")
+            httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
+                val bookInfo = parseJson(responseBody)
+                if (bookInfo != null){
+                    Toast.makeText(requireContext(), bookInfo.title+" "+bookInfo.authors, Toast.LENGTH_SHORT).show()
+                    Log.d("Title",bookInfo.title)
+                    if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
+                    Log.d("Authors:",bookInfo.authors.toString())
                 }
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

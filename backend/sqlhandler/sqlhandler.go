@@ -161,7 +161,7 @@ func GetBooks(shelf_id string) (string, error) {
 	return string(jsonData), nil
 }
 
-func AddShelf(name, user_id string) error {
+func AddShelf(name, user_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 	cmd := `
@@ -171,19 +171,33 @@ func AddShelf(name, user_id string) error {
 	_, err := db.Exec(cmd, name, user_id)
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return "", err
 	}
-	return nil
+
+	row, err := db.Query("SELECT shelf_id FROM shelves WHERE user_id = ? AND name = ?", user_id, name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer row.Close()
+
+	var shelf_id string
+	for row.Next() {
+		err := row.Scan(&shelf_id)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return shelf_id, nil
 }
 
-func DeleteShelf(name, user_id string) error {
+func DeleteShelf(shelf_id string) error {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 	cmd := `
 		DELETE FROM shelves
-		WHERE name = ? AND user_id = ?
+		WHERE shelf_id = ?
 	`
-	_, err := db.Exec(cmd, name, user_id)
+	_, err := db.Exec(cmd, shelf_id)
 	if err != nil {
 		log.Fatal(err)
 		return err

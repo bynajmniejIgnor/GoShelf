@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
     }
     var globalServerAddress: String = "192.168.8.106:8080"
     var globalUserId: String = ""
-    @SuppressLint("HardwareIds")
     var globalAndroidId: String = ""
 
     companion object {
@@ -72,7 +71,6 @@ class MainActivity : AppCompatActivity() {
                     .commit()
             }
         }
-
     }
 
     override fun onBackPressed() {

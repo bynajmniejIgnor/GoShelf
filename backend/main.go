@@ -73,18 +73,17 @@ func main() {
 		user_id := c.Param("user_id")
 		name := c.Param("name")
 
-		err := sqlhandler.AddShelf(name, user_id)
+		shelf_id, err := sqlhandler.AddShelf(name, user_id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
 		}
-		return c.JSON(http.StatusOK, OKresponse{JsonData: "shelf added"})
+		return c.JSON(http.StatusOK, OKresponse{JsonData: shelf_id})
 	})
 
-	e.GET("deleteShelf/:user_id/:name", func(c echo.Context) error {
-		user_id := c.Param("user_id")
-		name := c.Param("name")
+	e.GET("deleteShelf/:shelf_id", func(c echo.Context) error {
+		shelf_id := c.Param("shelf_id")
 
-		err := sqlhandler.DeleteShelf(name, user_id)
+		err := sqlhandler.DeleteShelf(shelf_id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
 		}
