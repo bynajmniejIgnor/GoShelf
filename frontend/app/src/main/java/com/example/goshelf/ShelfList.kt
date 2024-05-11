@@ -129,7 +129,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         addBookBtn.height = shelfHeight
 
         val delBookBtn = Button(requireContext())
-        delBookBtn.text = "-"
+        delBookBtn.text = "\uD83D\uDDD1\uFE0F"
         val delParams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -184,6 +184,11 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             builder.setPositiveButton("Confirm") { dialog, _ ->
                 httpGet("http://${MainActivity.getInstance().globalServerAddress}/deleteShelf/$id"){}
                 Toast.makeText(context, "Shelf $name disintegrated", Toast.LENGTH_SHORT).show()
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
+                    replace(R.id.fragment_container, ShelfList().apply{})
+                    addToBackStack(null)
+                    commit()
+                }
                 dialog.dismiss()
             }
 
@@ -309,7 +314,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
-}
+ }
 
 class CaptureActivityPortrait : CaptureActivity() {
 

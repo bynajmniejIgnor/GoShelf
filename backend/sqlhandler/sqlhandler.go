@@ -204,3 +204,31 @@ func DeleteShelf(shelf_id string) error {
 	}
 	return nil
 }
+
+func SearchShelf(user_id, name string) (string, error) {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+
+	rows, err := db.Query("SELECT name, shelf_id FROM shelves WHERE user_id = ? AND name LIKE %?%")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var shelves []Shelf
+	var shelf Shelf
+	for rows.Next() {
+		err := rows.Scan(&shelf.Name, &shelf.Shelf_id, &shelf.Books_stored)
+		if err != nil {
+			log.Fatal(err)
+		}
+		shelves = append(shelves, shelf)
+	}
+
+	jsonData, err := json.Marshal(shelves)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(jsonData), nil
+}
