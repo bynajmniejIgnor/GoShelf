@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    var globalServerAddress: String = "192.168.8.106:8080"
+    var globalServerAddress: String = "192.168.0.168:8080"
     var globalUserId: String = ""
     var globalAndroidId: String = ""
     var globalTmpShelfId: String = ""

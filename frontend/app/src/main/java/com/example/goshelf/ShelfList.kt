@@ -34,7 +34,7 @@ import org.json.JSONObject
 
 class ShelfList : Fragment(R.layout.fragment_list) {
     private val client = OkHttpClient()
-    val returnFromShelfSearch = "Back to all them shelves"
+    private val returnFromShelfSearch = "Back to all them shelves"
 
         @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -82,7 +82,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             newShelfNameField.hideKeyboard()
         }
 
-        val searched = arguments?.getString("searched")
+        val searched = arguments?.getString("shelfSearch")
         if (searched.isNullOrEmpty()) {
             httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelves/${MainActivity.getInstance().globalUserId}") { responseBody ->
                 displayShelves(view, responseBody)
@@ -162,6 +162,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         shelfParams.setMargins(8, 8, 8, 8)
         shelfBtn.layoutParams = shelfParams
         shelfBtn.height = shelfHeight
+
 
         linearLayout.addView(delBookBtn)
         linearLayout.addView(shelfBtn)

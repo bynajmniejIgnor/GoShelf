@@ -94,11 +94,17 @@ func main() {
 
 	e.GET("/search/:object/:user_id/:query", func(c echo.Context) error {
 		object := c.Param("object")
-		query := c.Param("query")
+		query, _ := url.QueryUnescape(c.Param("query"))
 		user_id := c.Param("user_id")
 
 		if object == "shelf" {
-			resp, err := sqlhandler.SearchShelf(user_id, query)
+			resp, err := sqlhandler.ShelfSearch(user_id, query)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
+			}
+			return c.JSON(http.StatusOK, OKresponse{JsonData: resp})
+		} else if object == "book" {
+			resp, err := sqlhandler.BookSearch(query)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: resp})
 			}

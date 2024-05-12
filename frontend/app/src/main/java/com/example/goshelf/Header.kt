@@ -79,17 +79,22 @@ class Header : Fragment() {
             Log.d("REQ","http://${MainActivity.getInstance().globalServerAddress}/search/$obj/${MainActivity.getInstance().globalUserId}/$query")
             httpGet("http://${MainActivity.getInstance().globalServerAddress}/search/$obj/${MainActivity.getInstance().globalUserId}/$query"){ resp ->
                 Log.d("SEARCH",resp)
-
-                val args = Bundle().apply {
-                    putString("searched", resp)
-                }
+                val args = Bundle()
                 activity?.supportFragmentManager?.beginTransaction()?.apply {
                     if (obj == "shelf") {
+                        args.apply {
+                            putString("shelfSearch", resp)
+                        }
                         replace(R.id.fragment_container, ShelfList().apply {
                             arguments = args
                         })
                     } else {
-                        //TODO: HANDLE BOOK SEARCHES
+                        args.apply {
+                            putString("bookSearch", resp)
+                        }
+                        replace(R.id.fragment_container, ShelfContent().apply {
+                            arguments = args
+                        })
                     }
                     addToBackStack(null)
                     commit()
@@ -98,8 +103,7 @@ class Header : Fragment() {
         }
         return view
     }
-
-    fun httpGet(url: String, callback: (String) -> Unit) {
+fun httpGet(url: String, callback: (String) -> Unit) {
         val request = Request.Builder()
             .url(url)
             .build()

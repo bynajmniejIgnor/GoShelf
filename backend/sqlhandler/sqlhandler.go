@@ -30,7 +30,7 @@ type Shelf struct {
 }
 
 type Book struct {
-	Title, Subtitle, Authors string
+	Title, Subtitle, Authors, Shelf_id string
 }
 
 func GetShelves(user_id string) (string, error) {
@@ -206,7 +206,7 @@ func DeleteShelf(shelf_id string) error {
 	return nil
 }
 
-func SearchShelf(user_id, name string) (string, error) {
+func ShelfSearch(user_id, name string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
@@ -268,7 +268,7 @@ func BookSearch(query string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 	f_query := fmt.Sprintf("%%%s%%", query)
-	rows, err := db.Query("SELECT title, subtitle, authors FROM books WHERE title LIKE ? OR subtitle LIKE ? OR authors LIKE ?", f_query, f_query, f_query)
+	rows, err := db.Query("SELECT title, subtitle, authors, shelf_id FROM books WHERE title LIKE ? OR subtitle LIKE ? OR authors LIKE ?", f_query, f_query, f_query)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -278,7 +278,7 @@ func BookSearch(query string) (string, error) {
 	var books []Book
 
 	for rows.Next() {
-		err := rows.Scan(&book.Title, &subtitle, &book.Authors)
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Shelf_id)
 		if err != nil {
 			log.Fatal(err)
 		}
