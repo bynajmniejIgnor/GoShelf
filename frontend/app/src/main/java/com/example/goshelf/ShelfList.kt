@@ -186,6 +186,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         }
 
         addBookBtn.setOnClickListener {
+            MainActivity.getInstance().globalTmpShelfId = id
             startBarcodeScanning()
         }
 
@@ -259,7 +260,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                 val subtitle = if (volumeInfo.has("subtitle")) {
                     volumeInfo.getString("subtitle")
                 } else {
-                    null
+                    ""
                 }
 
                return BookInfo(title, subtitle, authors)
@@ -277,7 +278,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         // god bless https://stackoverflow.com/questions/33550042/zxing-embedded-setcaptureactivity-causes-that-the-activity-does-not-appear
         // now i can rotate my scanner
-        integrator.setOrientationLocked(false)
+        integrator.setOrientationLocked(true)
         integrator.setBeepEnabled(true)
 
         integrator.initiateScan()
@@ -298,8 +299,8 @@ class ShelfList : Fragment(R.layout.fragment_list) {
                     Log.d("Title",bookInfo.title)
                     if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
                     Log.d("Authors:",bookInfo.authors.toString())
+                    httpGet("http://${MainActivity.getInstance().globalServerAddress}/addBook/${MainActivity.getInstance().globalTmpShelfId}/${bookInfo.title}/${bookInfo.subtitle}/${bookInfo.authors}"){}
                 }
-
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     var globalServerAddress: String = "192.168.8.106:8080"
     var globalUserId: String = ""
     var globalAndroidId: String = ""
+    var globalTmpShelfId: String = ""
 
     companion object {
         private lateinit var instance: MainActivity

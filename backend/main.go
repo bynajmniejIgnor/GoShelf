@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goshelf/sqlhandler"
 	"net/http"
+	"net/url"
 
 	"github.com/labstack/echo/v4"
 )
@@ -104,6 +105,23 @@ func main() {
 			return c.JSON(http.StatusOK, OKresponse{JsonData: resp})
 		}
 		return fmt.Errorf("big nono")
+	})
+
+	e.GET("/addBook/:shelf_id/:title/:subtitle/:authors", func(c echo.Context) error {
+		shelf_id := c.Param("shelf_id")
+		title, _ := url.QueryUnescape(c.Param("title"))
+		subtitle, _ := url.QueryUnescape(c.Param("subtitle"))
+		authors, _ := url.QueryUnescape(c.Param("authors"))
+
+		if subtitle == "null" {
+			subtitle = ""
+		}
+
+		rowid, err := sqlhandler.AddBook(shelf_id, title, subtitle, authors)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: rowid})
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -231,4 +232,24 @@ func SearchShelf(user_id, name string) (string, error) {
 	}
 
 	return string(jsonData), nil
+}
+
+func AddBook(shelf_id, title, subtitle, authors string) (string, error) {
+	tmp := strings.Trim(authors, "[")
+	f_authors := strings.Trim(tmp, "]")
+
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+	cmd := `
+		INSERT INTO books (title, subtitle, authors, shelf_id)
+		VALUES (?, ?, ?, ?)`
+
+	result, err := db.Exec(cmd, title, subtitle, f_authors, shelf_id)
+	if err != nil {
+		log.Fatal(err)
+		return "", nil
+	}
+
+	rowid, _ := result.LastInsertId()
+	return fmt.Sprint(rowid), nil
 }
