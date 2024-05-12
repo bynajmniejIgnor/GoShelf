@@ -1,12 +1,14 @@
 package com.example.goshelf
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -85,7 +87,7 @@ class Login : Fragment() {
         }
 
 
-        val loginBtn= rootView.findViewById<Button>(R.id.loginBtn)
+        val loginBtn = rootView.findViewById<Button>(R.id.loginBtn)
 
         loginBtn.setOnClickListener {
             Log.d("Global",MainActivity.getInstance().globalServerAddress)
@@ -103,6 +105,8 @@ class Login : Fragment() {
                     if (userId != "-1") {
                         MainActivity.getInstance().globalUserId = userId
                         setAndroidId(userId)
+                        loginField.hideKeyboard()
+                        passwordField.hideKeyboard()
                         Toast.makeText(requireContext(), "Logged in as ${loginField.text}", Toast.LENGTH_SHORT).show()
                         activity?.supportFragmentManager?.beginTransaction()?.apply {
                             replace(R.id.fragmentContainerView, Header().apply{})
@@ -120,5 +124,9 @@ class Login : Fragment() {
             }
         }
         return rootView
+    }
+    private fun View.hideKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 }
