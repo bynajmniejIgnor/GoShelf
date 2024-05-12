@@ -57,14 +57,11 @@ class MainActivity : AppCompatActivity() {
         httpGet("http://$globalServerAddress/androidId/$globalAndroidId"){ resp ->
             val response = JSONObject(resp)
             val userId = response.getString("response").toString()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView, Header())
-                .addToBackStack(null)
-                .commit()
             if (userId != "" ) {
                 globalUserId = userId
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, ShelfList())
+                    .replace(R.id.fragmentContainerView, Header())
                     .addToBackStack(null)
                     .commit()
             } else {
