@@ -295,11 +295,13 @@ class ShelfList : Fragment(R.layout.fragment_list) {
             httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
                 val bookInfo = parseJson(responseBody)
                 if (bookInfo != null){
-                    Toast.makeText(requireContext(), bookInfo.title+" "+bookInfo.authors, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "New book is on the shelf :))", Toast.LENGTH_SHORT).show()
                     Log.d("Title",bookInfo.title)
                     if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
                     Log.d("Authors:",bookInfo.authors.toString())
                     httpGet("http://${MainActivity.getInstance().globalServerAddress}/addBook/${MainActivity.getInstance().globalTmpShelfId}/${bookInfo.title}/${bookInfo.subtitle}/${bookInfo.authors}"){}
+                } else {
+                    Toast.makeText(requireContext(), "Sorry, I don't recognize this ISBN :((", Toast.LENGTH_SHORT).show()
                 }
             }
         } else {

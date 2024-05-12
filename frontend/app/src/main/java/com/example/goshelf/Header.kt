@@ -84,9 +84,13 @@ class Header : Fragment() {
                     putString("searched", resp)
                 }
                 activity?.supportFragmentManager?.beginTransaction()?.apply {
-                    replace(R.id.fragment_container, ShelfList().apply{
-                        arguments = args
-                    })
+                    if (obj == "shelf") {
+                        replace(R.id.fragment_container, ShelfList().apply {
+                            arguments = args
+                        })
+                    } else {
+                        //TODO: HANDLE BOOK SEARCHES
+                    }
                     addToBackStack(null)
                     commit()
                 }

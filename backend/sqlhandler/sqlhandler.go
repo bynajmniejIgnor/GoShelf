@@ -16,7 +16,7 @@ func connect(db_path string) *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = db.Query("PRAGMA foreign_keys = ON;")
+	_, err = db.Exec("PRAGMA foreign_keys = ON;")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -250,6 +250,51 @@ func AddBook(shelf_id, title, subtitle, authors string) (string, error) {
 		return "", nil
 	}
 
+	cmd = `
+		UPDATE shelves
+		SET books_stored = (SELECT books_stored FROM shelves WHERE shelf_id = ?) + 1`
+
+	_, err = db.Exec(cmd, shelf_id)
+	if err != nil {
+		log.Fatal(err)
+		return "", nil
+	}
+
 	rowid, _ := result.LastInsertId()
 	return fmt.Sprint(rowid), nil
+}
+
+func BookSearch(query string) (string, error) {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+	f_query := fmt.Sprintf("%%%s%%", query)
+	rows, err := db.Query("SELECT title, subtitle, authors FROM books WHERE title LIKE ? OR subtitle LIKE ? OR authors LIKE ?", f_query, f_query, f_query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var book Book
+	var subtitle sql.NullString
+	var books []Book
+
+	for rows.Next() {
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if subtitle.Valid {
+			book.Subtitle = subtitle.String
+		} else {
+			book.Subtitle = ""
+		}
+		books = append(books, book)
+	}
+
+	result, err := json.Marshal(books)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(result), nil
 }
