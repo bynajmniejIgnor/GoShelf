@@ -14,11 +14,8 @@ class BackToMain : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_back_to_main, container, false)
 
-        val back_btn = view.findViewById<Button>(R.id.back_btn)
-
-        val loadedShelves = arguments?.getString("loadedShelves")
-
-        back_btn.setOnClickListener(){
+        val backBtn = view.findViewById<Button>(R.id.back_btn)
+        backBtn.setOnClickListener(){
             activity?.supportFragmentManager?.beginTransaction()?.apply {
                 replace(R.id.fragmentContainerView, Header().apply{})
                 replace(R.id.fragment_container, ShelfList().apply {})

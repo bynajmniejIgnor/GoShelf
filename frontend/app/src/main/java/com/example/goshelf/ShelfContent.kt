@@ -1,5 +1,6 @@
 package com.example.gobook
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.text.BoringLayout
 import android.util.Log
@@ -29,7 +30,7 @@ import org.json.JSONObject
 class ShelfContent : Fragment() {
 
     private val client = OkHttpClient()
-    private fun displayBook(view: View, name: String, subtitle: String, authors: String, shelfId: String?) {
+    private fun displayBook(view: View, bookId: String, name: String, subtitle: String, authors: String, shelfId: String?) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -43,16 +44,54 @@ class ShelfContent : Fragment() {
         linearLayout.orientation = LinearLayout.HORIZONTAL
         linearLayout.layoutParams = layoutParams
 
+        val delBookBtn = Button(requireContext())
+        val delBookParams = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            0.2f
+        )
+        delBookParams.setMargins(8, 47, 8, 8)
+        delBookBtn.layoutParams = delBookParams
+        delBookParams.height = bookHeight
+        delBookBtn.text = "\uD83D\uDDD1\uFE0F"
+
+        delBookBtn.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Delete book")
+            builder.setMessage("Are you sure you want to delete (incinerate) book $name?")
+
+            builder.setPositiveButton("Confirm") { dialog, _ ->
+                httpGet("http://${MainActivity.getInstance().globalServerAddress}/deleteBook/$bookId"){}
+                Toast.makeText(context, "Book $name incinerated", Toast.LENGTH_SHORT).show()
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
+                    replace(R.id.fragment_container, ShelfContent().apply{})
+                    addToBackStack(null)
+                    commit()
+                }
+                dialog.dismiss()
+            }
+
+            builder.setNegativeButton("Cancel") { dialog, _ ->
+                Toast.makeText(context, "Incineration cancelled", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+        linearLayout.addView(delBookBtn)
+
         val bookBtn = Button(requireContext())
         val bookParams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            0.8f
+            0.9f
         )
         bookParams.setMargins(8, 8, 8, 8)
         bookBtn.layoutParams = bookParams
         bookBtn.height = bookHeight
         bookBtn.text = name + "\n" + subtitle + "\n" + authors
+        bookBtn.textSize = 12f
         linearLayout.addView(bookBtn)
 
         if (shelfId?.isEmpty() == false) {
@@ -72,7 +111,7 @@ class ShelfContent : Fragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 0.2f
             )
-            shelfParams.setMargins(8, 50, 8, 8)
+            shelfParams.setMargins(8, 47, 8, 8)
             shelf.layoutParams = shelfParams
             shelf.height = bookHeight
             shelf.text = "➡️"
@@ -80,7 +119,6 @@ class ShelfContent : Fragment() {
             httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelfName/$shelfId") { resp ->
                 shelfName = JSONObject(resp).getString("response")
             }
-            Log.d("SHELFNAME", shelfName)
             shelf.setOnClickListener {
                 val args = Bundle()
                 args.apply {
@@ -128,13 +166,24 @@ class ShelfContent : Fragment() {
 
     private fun parseBooks(view: View, rawJson: String) {
         val response = JSONObject(rawJson).getString("response")
+        Log.d("TESTING", response)
+        if (response == "null") {
+            activity?.supportFragmentManager?.beginTransaction()?.apply {
+                replace(R.id.fragmentContainerView, BackToMain().apply{})
+                addToBackStack(null)
+                commit()
+            }
+            return
+        }
         val books = JSONArray(response)
         for (i in 0 until books.length()) {
             val title = books.getJSONObject(i).getString("Title")
             val subtitle = books.getJSONObject(i).getString("Subtitle")
             val authors = books.getJSONObject(i).getString("Authors")
-            val shelfId = books.getJSONObject(i)?.getString("Shelf_id")
-            displayBook(view, title, subtitle, authors, shelfId)
+            val shelfId = books.getJSONObject(i).getString("Shelf_id")
+            val bookId = books.getJSONObject(i).getString("Book_id")
+
+            displayBook(view, bookId, title, subtitle, authors, shelfId)
         }
     }
     override fun onCreateView(
@@ -161,7 +210,9 @@ class ShelfContent : Fragment() {
                 }
             }
         } else {
-            textView.text = "Books found"
+            val response = JSONObject(booksSearched).getString("response")
+            if (response == "null") textView.text = "No books found :(("
+            else textView.text = "Books found"
             Log.d("BOOK SEARCH", booksSearched)
             parseBooks(rootView, booksSearched)
         }

@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView"
+        android:layout_marginBottom="5dp"
         android:textAlignment="center"/>
 
     <Button
@@ -19,9 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:text="Back" />
+        android:text="Back to bookstand" />
 
     <ScrollView
+        android:layout_marginTop="10dp"
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

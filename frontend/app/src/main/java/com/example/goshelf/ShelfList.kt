@@ -112,8 +112,6 @@ class ShelfList : Fragment(R.layout.fragment_list) {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 
     private fun createShelf(view: View, name: String, booksOn: Int, id: String) {

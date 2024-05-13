@@ -139,5 +139,14 @@ func main() {
 		return c.JSON(http.StatusOK, OKresponse{JsonData: shelf_name})
 	})
 
+	e.GET("/deleteBook/:book_id", func(c echo.Context) error {
+		book_id := c.Param("book_id")
+		err := sqlhandler.DeleteBook(book_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: "The book is no more"})
+	})
+
 	e.Logger.Fatal(e.Start(":8080"))
 }

@@ -30,7 +30,7 @@ type Shelf struct {
 }
 
 type Book struct {
-	Title, Subtitle, Authors, Shelf_id string
+	Title, Subtitle, Authors, Shelf_id, Book_id string
 }
 
 func GetShelves(user_id string) (string, error) {
@@ -130,7 +130,7 @@ func GetBooks(shelf_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
-	rows, err := db.Query("SELECT title, subtitle, authors FROM books WHERE shelf_id = ?", shelf_id)
+	rows, err := db.Query("SELECT title, subtitle, authors, book_id FROM books WHERE shelf_id = ?", shelf_id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func GetBooks(shelf_id string) (string, error) {
 	var book Book
 	var subtitle sql.NullString
 	for rows.Next() {
-		err := rows.Scan(&book.Title, &subtitle, &book.Authors)
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Book_id)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -201,9 +201,8 @@ func DeleteShelf(shelf_id string) error {
 	_, err := db.Exec(cmd, shelf_id)
 	if err != nil {
 		log.Fatal(err)
-		return err
 	}
-	return nil
+	return err
 }
 
 func ShelfSearch(user_id, name string) (string, error) {
@@ -268,7 +267,7 @@ func BookSearch(query string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 	f_query := fmt.Sprintf("%%%s%%", query)
-	rows, err := db.Query("SELECT title, subtitle, authors, shelf_id FROM books WHERE title LIKE ? OR subtitle LIKE ? OR authors LIKE ?", f_query, f_query, f_query)
+	rows, err := db.Query("SELECT title, subtitle, authors, shelf_id, book_id FROM books WHERE title LIKE ? OR subtitle LIKE ? OR authors LIKE ?", f_query, f_query, f_query)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -278,7 +277,7 @@ func BookSearch(query string) (string, error) {
 	var books []Book
 
 	for rows.Next() {
-		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Shelf_id)
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Shelf_id, &book.Book_id)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -316,4 +315,14 @@ func GetShelfName(shelf_id string) (string, error) {
 	}
 
 	return shelf_name, nil
+}
+
+func DeleteBook(book_id string) error {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+	_, err := db.Exec("DELETE FROM books WHERE book_id = ?", book_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return err
 }
