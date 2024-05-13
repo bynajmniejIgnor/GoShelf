@@ -175,6 +175,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         shelfBtn.setOnClickListener {
             activity?.supportFragmentManager?.beginTransaction()?.apply {
+                setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left, R.anim.enter_left_to_right, R.anim.exit_left_to_right)
                 replace(R.id.fragmentContainerView, BackToMain().apply{})
                 replace(R.id.fragment_container, ShelfContent().apply{
                     arguments = args

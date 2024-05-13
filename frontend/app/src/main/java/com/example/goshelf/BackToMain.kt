@@ -17,6 +17,7 @@ class BackToMain : Fragment() {
         val backBtn = view.findViewById<Button>(R.id.back_btn)
         backBtn.setOnClickListener(){
             activity?.supportFragmentManager?.beginTransaction()?.apply {
+                setCustomAnimations(R.anim.enter_left_to_right, R.anim.exit_left_to_right, R.anim.enter_left_to_right, R.anim.exit_right_to_left)
                 replace(R.id.fragmentContainerView, Header().apply{})
                 replace(R.id.fragment_container, ShelfList().apply {})
                 addToBackStack(null)

@@ -2,9 +2,7 @@ package com.example.gobook
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.text.BoringLayout
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +11,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.fragment.app.Fragment
 import com.example.goshelf.BackToMain
 import com.example.goshelf.MainActivity
 import com.example.goshelf.R
@@ -144,7 +142,7 @@ class ShelfContent : Fragment() {
                     putString("shelfName", shelfName)
                 }
                 activity?.supportFragmentManager?.beginTransaction()?.apply {
-
+                    setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left, R.anim.enter_left_to_right, R.anim.exit_left_to_right)
                     replace(R.id.fragmentContainerView, BackToMain().apply{})
                     replace(R.id.fragment_container, ShelfContent().apply{
                         arguments = args
@@ -184,7 +182,6 @@ class ShelfContent : Fragment() {
 
     private fun parseBooks(view: View, rawJson: String) {
         val response = JSONObject(rawJson).getString("response")
-        Log.d("TESTING", response)
         if (response == "null") {
             activity?.supportFragmentManager?.beginTransaction()?.apply {
                 replace(R.id.fragmentContainerView, BackToMain().apply{})
@@ -203,6 +200,7 @@ class ShelfContent : Fragment() {
             displayBook(view, bookId, title, subtitle, authors, shelfId)
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
