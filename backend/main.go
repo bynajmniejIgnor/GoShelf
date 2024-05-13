@@ -130,5 +130,14 @@ func main() {
 		return c.JSON(http.StatusOK, OKresponse{JsonData: rowid})
 	})
 
+	e.GET("/shelfName/:shelf_id", func(c echo.Context) error {
+		shelf_id := c.Param("shelf_id")
+		shelf_name, err := sqlhandler.GetShelfName(shelf_id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error(), Msg: ""})
+		}
+		return c.JSON(http.StatusOK, OKresponse{JsonData: shelf_name})
+	})
+
 	e.Logger.Fatal(e.Start(":8080"))
 }

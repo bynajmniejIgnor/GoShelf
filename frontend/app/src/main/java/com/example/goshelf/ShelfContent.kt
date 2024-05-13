@@ -13,6 +13,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.example.goshelf.BackToMain
 import com.example.goshelf.MainActivity
 import com.example.goshelf.R
 import com.example.goshelf.ShelfList
@@ -75,6 +76,27 @@ class ShelfContent : Fragment() {
             shelf.layoutParams = shelfParams
             shelf.height = bookHeight
             shelf.text = "➡️"
+            var shelfName = ""
+            httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelfName/$shelfId") { resp ->
+                shelfName = JSONObject(resp).getString("response")
+            }
+            Log.d("SHELFNAME", shelfName)
+            shelf.setOnClickListener {
+                val args = Bundle()
+                args.apply {
+                    putString("shelfId", shelfId)
+                    putString("shelfName", shelfName)
+                }
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
+
+                    replace(R.id.fragmentContainerView, BackToMain().apply{})
+                    replace(R.id.fragment_container, ShelfContent().apply{
+                        arguments = args
+                    })
+                    addToBackStack(null)
+                    commit()
+                }
+            }
             linearLayout.addView(shelf)
         }
 
@@ -129,8 +151,8 @@ class ShelfContent : Fragment() {
 
         if (booksSearched.isNullOrEmpty()) {
             textView.text = shelfName + " books"
-
             httpGet("http://${MainActivity.getInstance().globalServerAddress}/books/$shelfId") { responseBody ->
+                Log.d("Books REQ", "http://${MainActivity.getInstance().globalServerAddress}/books/$shelfId")
                 Log.d("Books", responseBody)
                 try {
                     parseBooks(rootView, responseBody)

@@ -298,3 +298,22 @@ func BookSearch(query string) (string, error) {
 
 	return string(result), nil
 }
+
+func GetShelfName(shelf_id string) (string, error) {
+	db := connect("./sqlhandler/goshelf.db")
+	defer db.Close()
+	rows, err := db.Query("SELECT name FROM shelves WHERE shelf_id = ?", shelf_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var shelf_name string
+	for rows.Next() {
+		err := rows.Scan(&shelf_name)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return shelf_name, nil
+}

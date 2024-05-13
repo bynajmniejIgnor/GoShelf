@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 
 class BackToMain : Fragment() {
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
