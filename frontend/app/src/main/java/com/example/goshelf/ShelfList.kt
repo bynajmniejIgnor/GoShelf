@@ -314,15 +314,15 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startBarcodeScanning()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Camera permission required for scanning",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startBarcodeScanning()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Camera permission required for scanning",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun View.hideKeyboard() {

@@ -26,11 +26,11 @@ import okhttp3.Response
 import okio.IOException
 import org.json.JSONArray
 import org.json.JSONObject
+import java.lang.reflect.InvocationTargetException
 
 class ShelfContent : Fragment() {
-
     private val client = OkHttpClient()
-    private fun displayBook(view: View, bookId: String, name: String, subtitle: String, authors: String, shelfId: String?) {
+    private fun displayBook(view: View, bookId: String, name: String, subtitle: String, authors: String, shelfId: String) {
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
         val innerLinearLayout = scrollView.findViewById<LinearLayout>(R.id.inner_linear_layout)
 
@@ -55,16 +55,33 @@ class ShelfContent : Fragment() {
         delBookParams.height = bookHeight
         delBookBtn.text = "\uD83D\uDDD1\uFE0F"
 
+        var shelfName = ""
+        try {
+            httpGet("http://${MainActivity.getInstance().globalServerAddress}/shelfName/$shelfId") { resp ->
+                shelfName = JSONObject(resp).getString("response")
+            }
+        } catch (e: InvocationTargetException) {
+            Log.d("EXCEPTION",e.cause.toString())
+        }
+
         delBookBtn.setOnClickListener {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Delete book")
-            builder.setMessage("Are you sure you want to delete (incinerate) book $name?")
+            builder.setMessage("Are you sure you want to delete (incinerate) book $name on shelf $shelfName?")
 
             builder.setPositiveButton("Confirm") { dialog, _ ->
+                val args = Bundle().apply {
+                    putString("shelfId", shelfId)
+                    putString("shelfName", shelfName)
+                }
                 httpGet("http://${MainActivity.getInstance().globalServerAddress}/deleteBook/$bookId"){}
                 Toast.makeText(context, "Book $name incinerated", Toast.LENGTH_SHORT).show()
                 activity?.supportFragmentManager?.beginTransaction()?.apply {
-                    replace(R.id.fragment_container, ShelfContent().apply{})
+                    replace(R.id.fragment_container, ShelfContent().apply{
+                        arguments = args
+                    })
+
+                    replace(R.id.fragmentContainerView, BackToMain().apply{})
                     addToBackStack(null)
                     commit()
                 }
@@ -94,7 +111,8 @@ class ShelfContent : Fragment() {
         bookBtn.textSize = 12f
         linearLayout.addView(bookBtn)
 
-        if (shelfId?.isEmpty() == false) {
+        val booksSearched = arguments?.getString("bookSearch")
+        if (!booksSearched.isNullOrEmpty()) {
             val backBtn = view.findViewById<Button>(R.id.backBtn)
             backBtn.visibility = View.VISIBLE
             backBtn.setOnClickListener {
@@ -182,7 +200,6 @@ class ShelfContent : Fragment() {
             val authors = books.getJSONObject(i).getString("Authors")
             val shelfId = books.getJSONObject(i).getString("Shelf_id")
             val bookId = books.getJSONObject(i).getString("Book_id")
-
             displayBook(view, bookId, title, subtitle, authors, shelfId)
         }
     }

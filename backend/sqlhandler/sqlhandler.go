@@ -130,7 +130,7 @@ func GetBooks(shelf_id string) (string, error) {
 	db := connect("./sqlhandler/goshelf.db")
 	defer db.Close()
 
-	rows, err := db.Query("SELECT title, subtitle, authors, book_id FROM books WHERE shelf_id = ?", shelf_id)
+	rows, err := db.Query("SELECT title, subtitle, authors, shelf_id, book_id FROM books WHERE shelf_id = ?", shelf_id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func GetBooks(shelf_id string) (string, error) {
 	var book Book
 	var subtitle sql.NullString
 	for rows.Next() {
-		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Book_id)
+		err := rows.Scan(&book.Title, &subtitle, &book.Authors, &book.Shelf_id, &book.Book_id)
 		if err != nil {
 			log.Fatal(err)
 		}
