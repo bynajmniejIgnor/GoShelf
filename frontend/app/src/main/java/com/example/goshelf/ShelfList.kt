@@ -187,7 +187,15 @@ class ShelfList : Fragment(R.layout.fragment_list) {
 
         addBookBtn.setOnClickListener {
             MainActivity.getInstance().globalTmpShelfId = id
-            startBarcodeScanning()
+            activity?.supportFragmentManager?.beginTransaction()?.apply {
+                setCustomAnimations(R.anim.enter_right_to_left, R.anim.exit_right_to_left, R.anim.enter_left_to_right, R.anim.exit_left_to_right)
+                replace(R.id.fragmentContainerView, BackToMain().apply{})
+                replace(R.id.fragment_container, PickOne().apply{
+                    arguments = args
+                })
+                addToBackStack(null)
+                commit()
+            }
         }
 
         delBookBtn.setOnClickListener{
@@ -239,92 +247,7 @@ class ShelfList : Fragment(R.layout.fragment_list) {
         })
     }
 
-    data class BookInfo(
-        val title: String,
-        val subtitle: String?,
-        val authors: List<String>
-    )
-    private fun parseJson(rawJson: String): BookInfo? {
-        try {
-            val items = JSONObject(rawJson).getJSONArray("items")
-            if (items.length() > 0) {
-                val volumeInfo = items.getJSONObject(0).getJSONObject("volumeInfo")
-                val title = volumeInfo.getString("title")
-                val authorsArray = volumeInfo.getJSONArray("authors")
 
-                val authors = mutableListOf<String>()
-                for (i in 0 until authorsArray.length()) {
-                    authors.add(authorsArray.getString(i))
-                }
-
-                val subtitle = if (volumeInfo.has("subtitle")) {
-                    volumeInfo.getString("subtitle")
-                } else {
-                    ""
-                }
-
-               return BookInfo(title, subtitle, authors)
-            }
-        }
-        catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
-
-    private fun startBarcodeScanning() {
-        val integrator = IntentIntegrator.forSupportFragment(this)
-        integrator.setPrompt("Show me some book EANs")
-
-        // god bless https://stackoverflow.com/questions/33550042/zxing-embedded-setcaptureactivity-causes-that-the-activity-does-not-appear
-        // now i can rotate my scanner
-        integrator.setOrientationLocked(true)
-        integrator.setBeepEnabled(true)
-
-        integrator.initiateScan()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        val result: IntentResult? =
-            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null) {
-            val barcodeValue = result.contents
-            Log.d("BarcodeScanner", "Scanned: $barcodeValue")
-            httpGet("https://www.googleapis.com/books/v1/volumes?q=isbn:$barcodeValue") { responseBody ->
-                val bookInfo = parseJson(responseBody)
-                if (bookInfo != null){
-                    Toast.makeText(requireContext(), "New book is on the shelf :))", Toast.LENGTH_SHORT).show()
-                    Log.d("Title",bookInfo.title)
-                    if (bookInfo.subtitle != null) Log.d("Subtitle",bookInfo.subtitle)
-                    Log.d("Authors:",bookInfo.authors.toString())
-                    httpGet("http://${MainActivity.getInstance().globalServerAddress}/addBook/${MainActivity.getInstance().globalTmpShelfId}/${bookInfo.title}/${bookInfo.subtitle}/${bookInfo.authors}"){}
-                } else {
-                    Toast.makeText(requireContext(), "Sorry, I don't recognize this ISBN :((", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startBarcodeScanning()
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Camera permission required for scanning",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     private fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
