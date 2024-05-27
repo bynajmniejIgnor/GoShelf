@@ -1,13 +1,8 @@
 # GoShelf
-Simple project for Mobile Aplications class at uni for tracking your home library, written (backend at least) in Golang.
+Simple project for Mobile Aplications class at uni for tracking your home library, written in  Kotlin & Golang.
 ![logo](./misc/logo.jpg)
 
-#### Technologies used/to be used
+#### Technologies used
 * Android Studio
-* Tesseract (ocr)
-* Postgresdb 
-* ZeroTier (vpn - I got no public ip)
-* Docker (hell yeah)
-* Golang (backend)
-
-Work very much in progress...
+* Sqlite3 
+* Golang echo framework 
